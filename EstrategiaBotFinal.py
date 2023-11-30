@@ -80,12 +80,14 @@ class MyStrategy(bt.Strategy):
         if not self.position:
             if (bollinger_buy and rsi_buy or bollinger_buy and macd_buy):
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
-                self.order = self.buy()
-
+                cash_to_spend = self.broker.getvalue()  # Obtener el saldo actual
+                #print("CASH A GASTAR: ", cash_to_spend)
+                size = int(cash_to_spend // self.dataclose[0])  # Calcular el tamaño basado en el precio de cierre
+                self.order = self.buy(size=size)
         else:
             if (bollinger_sell and rsi_sell or bollinger_sell and (not macd_buy)):
                 self.log('SELL CREATE, %.2f' % self.dataclose[0])
-                self.order = self.sell()
+                self.order = self.sell(size=self.position.size)
 
     def stop(self):
         self.log('Ending Value %.2f' %
@@ -114,7 +116,7 @@ def run_strategy():
     cerebro.broker.set_cash(1000.0)
 
     # Agregar un sizer con tamaño fijo
-    cerebro.addsizer(bt.sizers.FixedSize, stake=100)
+    cerebro.addsizer(bt.sizers.FixedSize, stake=1)
 
     # Configurar la comisión
     cerebro.broker.setcommission(commission=0.001)
