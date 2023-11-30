@@ -80,8 +80,7 @@ class MyStrategy(bt.Strategy):
         if not self.position:
             if (bollinger_buy and rsi_buy or bollinger_buy and macd_buy):
                 self.log('BUY CREATE, %.2f' % self.dataclose[0])
-                cash_to_spend = self.broker.getvalue()  # Obtener el saldo actual
-                #print("CASH A GASTAR: ", cash_to_spend)
+                cash_to_spend = self.broker.getvalue() * 0.9 # Obtener el saldo actual
                 size = int(cash_to_spend // self.dataclose[0])  # Calcular el tamaño basado en el precio de cierre
                 self.order = self.buy(size=size)
         else:
